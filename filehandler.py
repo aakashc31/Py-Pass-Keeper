@@ -1,59 +1,70 @@
-import os
-import base64
+import os, sys, stat
+import base64, uuid, hashlib
 
-filename = "allData.dat";
-
-
-def createFileIfNotExists():
+separator = "\\"
+foldername = os.getcwd() + separator + "data"
+dictFilename = foldername + separator + "dictionary.dat"	
+	
+def checkFolder():
+	if not os.path.exists(foldername):
+		os.makedirs(foldername)
+	filename = dictFilename
 	if(not os.path.isfile(filename)):
 		fo = open(filename, "w")
 		fo.close()
+	return
 
 # returns a list of all the password descriptions in the file
 def getAllDesc():
-	lno = 0
 	ret = []
-	with open(filename, "r") as data:
+	with open(dictFilename) as data:
 		for line in data:
-			if lno % 3 == 0:
-				ret.append(line.strip())
+			l = line.strip().split('*#*')
+			if len(l) == 3:
+				ret.append(l[0])
 			else:
-				pass
-			lno += 1
-	return ret
+				pass #should raise some exception, right?
+	return ret;
 
-# appends the given entry to the file.
+# adds a new entry. Create a new file and add its entry to the dict file
 def flushEntry(desc, bc, cipher):
-	mode = "a"
-	fo = open(filename, mode)
-	fo.write(desc+'\n')
-	fo.write(bc.decode('utf-8') + '\n')
-	fo.write(cipher.decode('utf-8') + '\n')
-	fo.close()
+	# write the content to file
+	guid = str(uuid.uuid1())
+	filename = foldername + separator + guid + '.dat'
+	content = desc + '\n' + bc.decode('utf-8') + '\n' + cipher.decode('utf-8')
+	f = open(filename, 'w')
+	f.write(content)
+	f.close(); 
+
+	os.chmod(filename, stat.S_IRUSR);
+
+	# add entry to the dict file
+	checkSum =  hashlib.sha224(bytes(content, 'utf-8')).hexdigest()  
+	toWrite = desc + '*#*' + guid + '*#*' + checkSum + '\n'
+	f = open(dictFilename, 'a')
+	f.write(toWrite)
+	f.close()
 
 # fetch the entry from the file corresponding to the given description 'desc'
+# it is returned in string format so convert it to bytes later
 # if not available then returns an empty list
 def fetchDescEntry(desc):
-	ret = []
-	lno = 0
-	loc = -1
-	curr = []
-	with open(filename, "r") as data:
+	entry = []
+	with open(dictFilename) as data:
 		for line in data:
-			x = line.strip()
-			curr.append(x)
-			if x == desc:
-				loc = lno//3
-			lno += 1
-			if(lno % 3 == 0):
-				ret.append(curr)
-				curr = []
-	ret.append(curr)
-	ans = []
-	if loc == -1:
-		return ans
-	ans.append(ret[loc][1])
-	ans.append(ret[loc][2])
-	return ans
-
+			l = line.strip().split('*#*')
+			if len(l) == 3 and l[0] == desc:
+				entry = l
+				break
+	if len(entry) != 3:
+		return []
+	guid = entry[1]
+	filename = foldername + separator + guid + '.dat'
+	if not os.path.isfile(filename):
+		return []
+	ret = []
+	with open(filename) as data:
+		for line in data:
+			ret.append(line.strip())
+	return ret[1:] if len(ret) == 3 else []
 

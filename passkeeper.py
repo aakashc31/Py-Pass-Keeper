@@ -12,7 +12,7 @@ unpad = lambda s : s[:-ord(s[len(s)-1:])]
 # For now only checks if the data file exists or not. If not, then creates one. 
 # Later, may be consistency/integrity of the file will be checked.
 def preCheck():
-	createFileIfNotExists()
+	checkFolder()
 	return
 
 # To view the description of all the passwords that have been saved
