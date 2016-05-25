@@ -1,0 +1,7 @@
+
+1. Add logging
+2. Implement GUI
+3. Change filehandler. Make more robust and secure
+4. Files that are written should be binary rather than text
+5. Make flushing an atomic operation
+6. handle wrong inputs, etc
