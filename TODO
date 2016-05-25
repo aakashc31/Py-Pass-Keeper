@@ -6,8 +6,10 @@
 5. Make flushing an atomic operation
 6. handle wrong inputs, etc
 
-A folder for all the data. It'll have a dictionary file to map all desc to GUID's. Every guid will be a file. 
+A folder for all the data. It'll have a dictionary file to map all desc to GUID's and an MD5 for checking intergrity of the file. Every guid will be a file. 
 On startup, it will check the consistency of the data folder. All guid files will only have (desc-bcrypt-cipher) in 3 lines.
 In such a way, even if the dictionary file is corrupt, we can recreate it by reading all the guid files, ie, not a single point of failure. 
+
+
 
 Later, I am planning on extending it to files. 
