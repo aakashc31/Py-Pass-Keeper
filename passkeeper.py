@@ -12,12 +12,13 @@ unpad = lambda s : s[:-ord(s[len(s)-1:])]
 # For now only checks if the data file exists or not. If not, then creates one. 
 # Later, may be consistency/integrity of the file will be checked.
 def preCheck():
-	checkFolder()
+	checkDataIntegrity()
 	return
 
 # To view the description of all the passwords that have been saved
 def viewAllDesc():
-	r = getAllDesc();
+	r = getAllDesc()
+	r.sort()
 	for i in r:
 		print(i)
 	return
@@ -47,7 +48,7 @@ def addNewEntry():
 	flushEntry(desc, bc, cipher);
 	print('Entry added successfully!');
 
-#To view a password you have saved earlier
+# To view a password you have saved earlier
 def viewSavedEntry():
 	desc = input('Enter description: ');
 	
@@ -67,10 +68,38 @@ def viewSavedEntry():
 		ret = SKE.decrypt(key, cipher);
 		print(ret.decode('utf-8'))
 	else:
-		# time.sleep(2)
+		time.sleep(2)
 		print('Authentication Unsuccessful!')
 	return
 
+# To delete a saved entry
+def deleteSavedEntry():
+	desc = input('Enter description: ');
+	
+	r = fetchDescEntry(desc);
+	if len(r) == 0:
+		print(desc + ' does not exist');
+		return
+
+	bc = bytes(r[0], 'utf-8')
+	cipher = bytes(r[1], 'utf-8')
+	
+	key = getpass.getpass('Enter password: ');
+	if authenticator.checkAuth(key, bc):
+		print('Authentication Successfull!');
+		ch = input('Are you sure you want to delete this entry? (y/n)')
+		if ch == 'y' or ch == 'Y':
+			if deleteDescEntry(desc):
+				print('Delete Successful!')
+			else:
+				print('Delete Unsuccessful!')
+		else:
+			print('Delete unsuccessful')
+			pass
+	else:
+		time.sleep(2)
+		print('Authentication Unsuccessful!')
+	return
 
 def menu():
 	print('\n*****************')
@@ -94,7 +123,7 @@ def main():
 		elif ch == '3':
 			viewSavedEntry()
 		elif ch == '4':
-			pass
+			deleteSavedEntry()
 		elif ch == '5':
 			print('Exiting...')
 			return
