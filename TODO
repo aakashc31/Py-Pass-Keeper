@@ -6,7 +6,7 @@
 6. handle wrong inputs, etc
 7*. Delete entry
 8. Edit entry
-
+9*. Add database using sqlite. 
 
 A folder for all the data. It'll have a dictionary file to map all desc to GUID's and an MD5 for checking intergrity of the file. Every guid will be a file. 
 On startup, it will check the consistency of the data folder. All guid files will only have (desc-bcrypt-cipher) in 3 lines.
@@ -15,3 +15,5 @@ In such a way, even if the dictionary file is corrupt, we can recreate it by rea
 
 
 Later, I am planning on extending it to files. 
+
+Sync the files with google drive!

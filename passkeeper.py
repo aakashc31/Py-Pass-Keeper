@@ -1,8 +1,5 @@
-import SKE
-import time
-import authenticator
-from filehandler import *
-import getpass
+import SKE, time, authenticator, getpass
+from db import *
 
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(65 + BS - len(s) % BS) 
@@ -12,7 +9,7 @@ unpad = lambda s : s[:-ord(s[len(s)-1:])]
 # For now only checks if the data file exists or not. If not, then creates one. 
 # Later, may be consistency/integrity of the file will be checked.
 def preCheck():
-	checkDataIntegrity()
+	checkFolder()
 	return
 
 # To view the description of all the passwords that have been saved
